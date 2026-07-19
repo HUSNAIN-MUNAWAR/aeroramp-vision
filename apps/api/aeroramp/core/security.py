@@ -4,7 +4,7 @@ import hashlib
 import hmac
 import os
 from datetime import UTC, datetime, timedelta
-from typing import Any, cast
+from typing import Any
 
 import jwt
 from aeroramp.core.config import get_settings
@@ -49,7 +49,8 @@ def create_token(subject: str, organization_id: str, role: str, token_type: str)
         "iat": now,
         "exp": now + lifetime,
     }
-    return cast(str, jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algorithm))
+    encoded: str | bytes = jwt.encode(payload, settings.jwt_secret, algorithm=settings.jwt_algorithm)
+    return encoded.decode("utf-8") if isinstance(encoded, bytes) else encoded
 
 
 def decode_token(token: str, expected_type: str = "access") -> dict[str, Any]:
