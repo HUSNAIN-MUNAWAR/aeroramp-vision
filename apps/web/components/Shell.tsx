@@ -24,6 +24,7 @@ export function Shell({ children }: PropsWithChildren) {
         <div className="brand"><span className="brand-mark">AR</span><div><strong>AeroRamp Vision</strong><small>Ramp intelligence control</small></div></div>
         <nav>{links.map(([href, label]) => <Link key={href} href={href} className={path === href || (href !== "/" && path.startsWith(href)) ? "active" : ""}>{label}</Link>)}</nav>
         <div className="sidebar-footer">
+          <div className="decision-badge">Public/demo data</div>
           <div className="decision-badge">Decision support only</div>
           <button className="ghost-button" onClick={logout}>Sign out</button>
         </div>

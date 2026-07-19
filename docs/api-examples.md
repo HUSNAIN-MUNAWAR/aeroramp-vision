@@ -16,13 +16,15 @@ curl -X POST http://localhost:8000/api/v1/videos/upload \
   -H "Authorization: Bearer $TOKEN" \
   -F camera_id="$CAMERA_ID" \
   -F turnaround_id="$TURNAROUND_ID" \
-  -F detector_backend=synthetic_color \
+  -F detector_backend=motion \
   -F run_now=false \
-  -F file=@sample-data/synthetic-ramp.mp4
+  -F file=@sample-data/dvids-age-public.mp4
 
 curl -X POST http://localhost:8000/api/v1/processing-jobs/$JOB_ID/run \
   -H "Authorization: Bearer $TOKEN"
 ```
+
+Use `detector_backend=synthetic_color` only with `sample-data/synthetic-ramp.mp4`.
 
 ## Review and incident
 

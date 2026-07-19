@@ -10,6 +10,8 @@ __pycache__/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+test-results/
+test-storage/
 coverage.xml
 htmlcov/
 node_modules/
@@ -20,10 +22,16 @@ out/
 storage/uploads/*
 storage/evidence/*
 storage/observations/*
+storage/benchmarks/
+storage/*.log
+storage/*.csv
 !storage/uploads/.gitkeep
 !storage/evidence/.gitkeep
 !storage/observations/.gitkeep
+data/public/
+data/raw/
 sample-data/*.mp4
 !sample-data/synthetic-ramp.mp4
+!sample-data/dvids-age-public.mp4
 !sample-data/.gitkeep
 edge-buffer.db

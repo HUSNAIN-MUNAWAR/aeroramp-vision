@@ -145,10 +145,10 @@ class SafetyRuleEngine:
         time_threshold = float(rule.config.get("time_threshold_seconds", 2.0))
         output: list[AlertCandidate] = []
         for i, first in enumerate(tracks):
-            if len(first.points) < 2:
+            if not self._eligible(rule, first) or len(first.points) < 2:
                 continue
             for second in tracks[i + 1:]:
-                if len(second.points) < 2:
+                if not self._eligible(rule, second) or len(second.points) < 2:
                     continue
                 f0, f1 = first.points[-2:]
                 s0, s1 = second.points[-2:]

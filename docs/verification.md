@@ -90,3 +90,30 @@ The `synthetic_color` backend is a deterministic test-fixture detector. This ben
 - `.github/workflows/ci.yml` with backend, frontend, and Docker jobs
 
 The CI workflow is configured to run Compose validation and build both Dockerfiles on a Docker-enabled GitHub runner.
+
+## Public Dataset Addendum
+
+The public dataset integration was verified on 2026-07-19 with the DVIDS `Aerospace Ground Equipment ensures aircraft are ready for flight` demo clip documented in [docs/DATASET.md](DATASET.md).
+
+```bash
+py -3.12 scripts/download_public_dataset.py --force
+py -3.12 scripts/download_public_dataset.py --help
+py -3.12 scripts/benchmark.py sample-data/dvids-age-public.mp4 --detector motion --fps 6
+py -3.12 -m ruff check .
+py -3.12 -m mypy apps/api/aeroramp packages/sdk/python/aeroramp_sdk scripts
+py -3.12 -m pytest
+npm --prefix apps/web run lint
+npm --prefix apps/web run typecheck
+npm --prefix apps/web audit --audit-level=high
+cd apps/web && npx next build --webpack
+```
+
+Observed public-demo results:
+
+- Prepared clip: 640x360 MP4, 12 FPS, 432 frames, 36 seconds, SHA-256 `f01e0dc46143e263d40ab73e45312aa373fccd24a206db8e7f3f8961744a0da4`.
+- API processing run: completed with `motion`, 216 sampled frames, 152 generic tracks, 135 review candidates, and 135 CSV report rows.
+- Evidence check: authenticated snapshot and clip requests returned HTTP 200.
+- Benchmark script: processed 216 sampled frames at 33.2 processed frames/second on this local CPU-only run.
+- Screenshots: refreshed from the local Next.js app backed by the public-demo processing run.
+
+Local Windows note: some Python commands were run through a small in-process `platform.machine` monkeypatch because SQLAlchemy import could stall inside Windows WMI discovery on this workstation. No repository runtime code depends on that workaround, and Linux CI does not require it.

@@ -86,10 +86,12 @@ def seed(reset: bool = False) -> dict[str, str]:
         db.add_all([envelope, pushback, service])
         db.flush()
         db.add_all([
+            SafetyRule(organization_id=org.id, camera_id=camera_a.id, zone_id=envelope.id, name="Generic motion inside public-demo envelope", rule_type="restricted_zone_entry", severity="medium", config={"classes": ["moving_object"], "public_dataset_demo": True}, cooldown_seconds=6, debounce_seconds=1.0, version=1),
+            SafetyRule(organization_id=org.id, camera_id=camera_a.id, zone_id=pushback.id, name="Generic motion in public-demo pushback route", rule_type="pushback_path_obstruction", severity="medium", config={"classes": ["moving_object"], "public_dataset_demo": True}, cooldown_seconds=6, debounce_seconds=1.0, version=1),
             SafetyRule(organization_id=org.id, camera_id=camera_a.id, zone_id=envelope.id, name="Potential person entry into aircraft envelope", rule_type="person_in_restricted_zone", severity="high", config={"classes": ["person"]}, cooldown_seconds=6, debounce_seconds=1.0, version=1),
             SafetyRule(organization_id=org.id, camera_id=camera_a.id, zone_id=pushback.id, name="Possible pushback route obstruction", rule_type="pushback_path_obstruction", severity="high", config={"classes": ["person", "service_vehicle"]}, cooldown_seconds=6, debounce_seconds=1.0, version=1),
             SafetyRule(organization_id=org.id, camera_id=camera_a.id, zone_id=service.id, name="Equipment left in service zone", rule_type="equipment_left_behind", severity="medium", config={"classes": ["service_vehicle"], "stationary_distance_pixels": 4, "dwell_seconds": 2.5}, cooldown_seconds=8, debounce_seconds=0.5, version=1),
-            SafetyRule(organization_id=org.id, camera_id=camera_a.id, zone_id=None, name="Candidate near-miss", rule_type="candidate_near_miss", severity="high", config={"distance_threshold_pixels": 55, "time_threshold_seconds": 1.5}, cooldown_seconds=8, debounce_seconds=0, version=1),
+            SafetyRule(organization_id=org.id, camera_id=camera_a.id, zone_id=None, name="Candidate near-miss", rule_type="candidate_near_miss", severity="high", config={"classes": ["person", "service_vehicle"], "distance_threshold_pixels": 55, "time_threshold_seconds": 1.5}, cooldown_seconds=8, debounce_seconds=0, version=1),
         ])
         now = datetime.now(UTC)
         turnaround = Turnaround(organization_id=org.id, airport_id=airport.id, stand_id=stands[0].id, airline_code="AR", flight_number="ARV101", aircraft_registration="N-DEMO", aircraft_type="A320-simulated", scheduled_arrival=now - timedelta(minutes=25), scheduled_departure=now + timedelta(minutes=25), status="aircraft_approaching", manual_review_state="not_reviewed")
