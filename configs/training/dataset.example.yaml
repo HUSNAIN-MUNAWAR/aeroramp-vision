@@ -1,0 +1,16 @@
+# Copy this file and point `path` at a licensed, site-approved dataset.
+# Images and labels are not bundled with AeroRamp Vision.
+path: datasets/aeroramp-custom
+train: images/train
+val: images/val
+test: images/test
+
+names:
+  0: aircraft
+  1: person
+  2: pushback_tug
+  3: baggage_cart
+  4: belt_loader
+  5: passenger_bus
+  6: catering_truck
+  7: fuel_truck

@@ -1,0 +1,123 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-aeroramp}
+      POSTGRES_USER: ${POSTGRES_USER:-aeroramp}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-aeroramp}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-aeroramp} -d ${POSTGRES_DB:-aeroramp}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: infrastructure/Dockerfile.api
+    environment:
+      AERORAMP_ENVIRONMENT: production
+      AERORAMP_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-aeroramp}:${POSTGRES_PASSWORD:-aeroramp}@postgres:5432/${POSTGRES_DB:-aeroramp}
+      AERORAMP_JWT_SECRET: ${AERORAMP_JWT_SECRET:-development-only-change-this-secret-immediately}
+      AERORAMP_CORS_ORIGINS: ${AERORAMP_CORS_ORIGINS:-http://localhost:3000}
+      AERORAMP_TRUSTED_HOSTS: ${AERORAMP_TRUSTED_HOSTS:-localhost,127.0.0.1,api}
+      AERORAMP_UPLOAD_DIR: /app/storage/uploads
+      AERORAMP_EVIDENCE_DIR: /app/storage/evidence
+      AERORAMP_OBSERVATION_DIR: /app/storage/observations
+      AERORAMP_SEED_DEVELOPMENT_DATA: ${AERORAMP_SEED_DEVELOPMENT_DATA:-true}
+    command:
+      - sh
+      - -c
+      - >-
+        alembic upgrade head &&
+        if [ "$${AERORAMP_SEED_DEVELOPMENT_DATA}" = "true" ]; then
+          python scripts/seed.py && python scripts/generate_synthetic_video.py;
+        fi &&
+        uvicorn aeroramp.main:app --app-dir apps/api --host 0.0.0.0 --port 8000
+    volumes:
+      - shared_storage:/app/storage
+      - sample_data:/app/sample-data
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready', timeout=3)"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+
+  worker:
+    build:
+      context: .
+      dockerfile: infrastructure/Dockerfile.api
+    environment:
+      AERORAMP_ENVIRONMENT: production
+      AERORAMP_DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-aeroramp}:${POSTGRES_PASSWORD:-aeroramp}@postgres:5432/${POSTGRES_DB:-aeroramp}
+      AERORAMP_JWT_SECRET: ${AERORAMP_JWT_SECRET:-development-only-change-this-secret-immediately}
+      AERORAMP_UPLOAD_DIR: /app/storage/uploads
+      AERORAMP_EVIDENCE_DIR: /app/storage/evidence
+      AERORAMP_OBSERVATION_DIR: /app/storage/observations
+    command: ["python", "apps/worker/main.py"]
+    volumes:
+      - shared_storage:/app/storage
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  web:
+    build:
+      context: .
+      dockerfile: infrastructure/Dockerfile.web
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    environment:
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  simulator:
+    build:
+      context: .
+      dockerfile: infrastructure/Dockerfile.api
+    environment:
+      AERORAMP_SIMULATOR_VIDEO: /app/sample-data/synthetic-ramp.mp4
+    command: ["uvicorn", "apps.inference.main:app", "--host", "0.0.0.0", "--port", "8090"]
+    volumes:
+      - sample_data:/app/sample-data
+    ports:
+      - "8090:8090"
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+  redis_data:
+  shared_storage:
+  sample_data:

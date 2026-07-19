@@ -1,0 +1,17 @@
+services:
+  worker:
+    build:
+      context: .
+      dockerfile: infrastructure/Dockerfile.api
+      args:
+        PIP_INSTALL_TARGET: ".[postgres,yolo]"
+    environment:
+      AERORAMP_DEFAULT_DETECTOR: yolo
+      NVIDIA_VISIBLE_DEVICES: all
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
