@@ -1,4 +1,4 @@
-.PHONY: install seed fixture api worker web test lint typecheck build migrate benchmark compose-up compose-down clean
+.PHONY: install seed fixture api worker web test lint typecheck build migrate benchmark runtime-evidence compose-up compose-down clean
 
 install:
 	pip install -e '.[dev]'
@@ -37,6 +37,9 @@ migrate:
 
 benchmark:
 	python scripts/benchmark.py sample-data/synthetic-ramp.mp4 --detector synthetic_color --fps 6
+
+runtime-evidence:
+	PYTHONPATH=apps/api:packages/sdk/python python scripts/generate_runtime_evidence.py
 
 compose-up:
 	docker compose up -d --build

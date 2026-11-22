@@ -202,6 +202,23 @@ On the 2026-07-19 local verification run, the app processed 432 source frames as
 
 The demo uses public video, seeded local accounts, generic motion detection, and public/demo labels in the UI. It does not contain real customer data, private airport footage, credentials, passenger records, or production deployment evidence.
 
+### Measured runtime evidence
+
+The committed evidence below is a fresh standalone run of the real OpenCV `motion` pipeline against the public DVIDS clip. It decoded 432 source frames, analyzed 144 sampled frames at 4 FPS, persisted 144 observation frames and the emitted track trace, and wrote a 144-frame 640x360 annotated MP4. Reproduce it with:
+
+```powershell
+$env:PYTHONPATH = "apps/api;packages/sdk/python"
+py -3.12 scripts/generate_runtime_evidence.py
+```
+
+- [Annotated runtime video](docs/runtime_evidence/aeroramp-dvids-motion-runtime.mp4)
+- [Runtime poster](docs/runtime_evidence/aeroramp-dvids-motion-runtime-poster.jpg)
+- [Track trace](docs/runtime_evidence/aeroramp-dvids-motion-track-trace.csv)
+- [Compressed observations](docs/runtime_evidence/aeroramp-dvids-motion-observations.json.gz)
+- [Hashable runtime summary and claim boundary](docs/runtime_evidence/aeroramp-dvids-motion-runtime-summary.json)
+
+This evidence uses generic OpenCV motion regions labeled `moving_object`; it does not claim a trained airport detector, semantic aircraft/person classification, safety accuracy, certification, or manually authored detections. See [docs/runtime_evidence/README.md](docs/runtime_evidence/README.md).
+
 ## API Examples
 
 ```bash

@@ -1,0 +1,83 @@
+{
+  "generated_at": "2026-11-22T20:03:17.553171+00:00",
+  "environment": {
+    "os": "Windows-11-10.0.22631-SP0",
+    "python": "3.12.10",
+    "opencv": "4.13.0"
+  },
+  "source": {
+    "dataset": "DVIDS video 838428: Aerospace Ground Equipment ensures aircraft are ready for flight",
+    "publisher": "DVIDS / U.S. Air Force",
+    "source_page": "https://www.dvidshub.net/video/838428/aerospace-ground-equipment-ensures-aircraft-ready-flight",
+    "license": "Public domain / U.S. Government visual information with DVIDS public-use restrictions",
+    "file": "sample-data/dvids-age-public.mp4",
+    "sha256": "f01e0dc46143e263d40ab73e45312aa373fccd24a206db8e7f3f8961744a0da4",
+    "metadata": {
+      "fps": 12.0,
+      "frame_count": 432,
+      "width": 640,
+      "height": 360,
+      "duration_seconds": 36.0
+    }
+  },
+  "detector": {
+    "backend": "motion",
+    "algorithm": "OpenCV MOG2 background subtraction, median blur, morphology, contour-area filtering",
+    "class_output": "moving_object",
+    "model_checkpoint": null
+  },
+  "pipeline": {
+    "fps": 12.0,
+    "frame_count": 432,
+    "width": 640,
+    "height": 360,
+    "duration_seconds": 36.0,
+    "processed_frames": 144,
+    "sample_every": 3,
+    "processing_seconds": 11.55378909999854,
+    "processing_fps": 12.463443702639353,
+    "detector_backend": "motion",
+    "metric_calibration": false,
+    "privacy_applied": false,
+    "observation_sha256": "04a3c8b97166a0cf474833649c2bc9bc204e0d87a326b85d9f6ecb6643cf2485",
+    "track_count": 69,
+    "observation_frames": 144,
+    "track_trace_rows": 1272,
+    "alerts": 0,
+    "milestones": 0,
+    "encoded_output": {
+      "frames": 144,
+      "fps": 4.0,
+      "width": 640,
+      "height": 360
+    }
+  },
+  "artifacts": {
+    "annotated_video": {
+      "path": "docs/runtime_evidence/aeroramp-dvids-motion-runtime.mp4",
+      "bytes": 3580822,
+      "sha256": "78988264cdaa0c1d67a80cb79398d90a46be5b167ff8ae93303474f6eecca7f8"
+    },
+    "poster": {
+      "path": "docs/runtime_evidence/aeroramp-dvids-motion-runtime-poster.jpg",
+      "bytes": 115690,
+      "sha256": "e188207ad4a0ba009327c82502778a7b5ab44761841402abbd3bec5c6a6d636b"
+    },
+    "track_trace": {
+      "path": "docs/runtime_evidence/aeroramp-dvids-motion-track-trace.csv",
+      "bytes": 76499,
+      "sha256": "589878da2c5edd7ec8873723c0acda26042e3aeacdca90f844f1879259faa6b7"
+    },
+    "observations": {
+      "path": "docs/runtime_evidence/aeroramp-dvids-motion-observations.json.gz",
+      "bytes": 18713,
+      "sha256": "04a3c8b97166a0cf474833649c2bc9bc204e0d87a326b85d9f6ecb6643cf2485"
+    }
+  },
+  "claim_boundary": [
+    "This is a real OpenCV motion-detector run over decoded public DVIDS video pixels.",
+    "The detector emits generic moving_object regions; it does not identify aircraft, vehicles, or people.",
+    "No airport-specific checkpoint, training run, accuracy benchmark, certification, or manually authored detection is claimed.",
+    "No safety rules were supplied to this standalone benchmark, so zero alerts is an intentional configuration result, not a safety conclusion."
+  ]
+}
