@@ -78,6 +78,8 @@ def main() -> None:
         milestone_rules=[],
         target_fps=4.0,
     )
+    if result.annotated_video_path is None:
+        raise RuntimeError("Motion runtime did not produce an annotated video")
     Path(result.annotated_video_path).replace(ANNOTATED)
     Path(result.observation_path).replace(OBSERVATIONS)
     run_dir.rmdir()

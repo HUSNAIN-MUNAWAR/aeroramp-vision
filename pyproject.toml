@@ -26,7 +26,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=8,<10", "ruff>=0.9,<1", "mypy>=1.14,<2"]
+dev = ["pytest>=8,<10", "ruff>=0.15.20,<0.16", "mypy>=1.14,<2"]
 postgres = ["psycopg[binary]>=3.2,<4"]
 redis = ["redis>=5,<7"]
 yolo = ["ultralytics>=8.3,<9"]
