@@ -63,6 +63,12 @@ def _draw_frame(frame, tracks: list[TrackState], zones: list[dict[str, Any]], al
     return frame
 
 
+def _write_snapshot(path: Path, frame: Any) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    if not cv2.imwrite(str(path), frame):
+        raise RuntimeError(f"Could not write evidence snapshot: {path}")
+
+
 
 def _alert_key(alert: AlertCandidate) -> str:
     return f"{alert.rule_id}-{alert.track_id}-{int(alert.timestamp_seconds * 1000)}"
@@ -147,6 +153,9 @@ def process_video(
         source_fps / sample_every,
         (metadata["width"], metadata["height"]),
     )
+    if not writer.isOpened():
+        capture.release()
+        raise RuntimeError(f"Could not open annotated video writer: {annotated_path}")
     observations: list[dict[str, Any]] = []
     alerts: list[AlertCandidate] = []
     milestones = []
@@ -198,7 +207,7 @@ def process_video(
             )
             privacy_applied = privacy_applied or frame_redacted
             rendered = _draw_frame(privacy_frame, active_tracks, zones, [alert])
-            cv2.imwrite(str(snapshot_path), rendered)
+            _write_snapshot(snapshot_path, rendered)
             snapshots[alert_key] = str(snapshot_path)
         privacy_frame, frame_redacted = apply_privacy(
             frame,
